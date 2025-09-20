@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help - Mindmate.ai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* General Page Styling */
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #e0e0e0;
+      line-height: 1.7;
+      padding: 24px;
+      overflow-x: hidden;
+      
+      /* FIX: Replaced the extreme red with a soothing pink (#c33764) */
+      background: linear-gradient(45deg, #0f0c29, #302b63, #24243e, #1a2a6c, #c33764, #fdbb2d);
+      background-size: 400% 400%;
+      animation: gradientAnimation 25s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    @keyframes floatAnimation {
+      0% { transform: translateY(0px) rotateY(0deg); }
+      50% { transform: translateY(-12px) rotateY(4deg); }
+      100% { transform: translateY(0px) rotateY(0deg); }
+    }
+
+    /* Back Button */
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 12px 22px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    /* Help Section with 3D Glass Effect */
+    .help-container {
+      max-width: 800px;
+      margin: 0 auto 40px auto;
+      padding: 30px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 0.5s ease;
+      transform-style: preserve-3d;
+    }
+
+    .help-container:hover {
+      transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+    }
+
+    .help-container h1, .help-container h2 {
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .help-container h1 { font-size: 1.8rem; margin-bottom: 15px; }
+    .help-container h2 { margin-top: 25px; font-size: 1.4rem; }
+    .help-container b { color: #fdbb2d; font-weight: 700; }
+    .help-container li { margin-bottom: 8px; }
+
+    /* Credits Box Styling */
+    .credits-container {
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 280px;
+      animation: floatAnimation 6s ease-in-out infinite;
+    }
+
+    @media (max-width: 768px) {
+      .credits-container {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        animation: none;
+      }
+    }
+
+    .credits-header {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.1rem;
+      user-select: none;
+      transition: background 0.3s ease;
+      color: #fff;
+    }
+
+    .credits-header:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .credits-content {
+      padding: 15px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease;
+    }
+    
+    .credits-content.show {
+      max-height: 300px;
+      opacity: 1;
+      padding: 20px;
+    }
+
+    .credits-content ul { list-style: none; padding: 0; margin: 0; }
+    .credits-content li { font-size: 0.95rem; margin: 8px 0; }
+    .credits-content .name { font-weight: bold; color: #fdbb2d; }
+    .credits-content .footer { margin-top: 10px; font-size: 0.8rem; opacity: 0.8; text-align: center; }
+
+  </style>
+</head>
+<body>
+
+  <a href="/chat" class="back-btn">← Back to Chat</a>
+
+  <div class="help-container">
+    <h1>Getting Started</h1>
+    <p>
+      Welcome to <b>Mindmate.ai</b>. This tool is designed to support your well-being by 
+      providing a safe, non-judgmental space to share your feelings. It can guide you 
+      with tips, coping strategies, and resources for better mental health.
+    </p>
+    <h2>Navigating the Interface</h2>
+    <ul>
+      <li><b>Chat Window:</b> Type your feelings, questions, or thoughts in the input box.</li>
+      <li><b>Voice Input:</b> Use the microphone icon to speak your thoughts directly.</li>
+      <li><b>Take the Test:</b> Assess your current mood or stress level with quick, 
+        interactive tests that give instant feedback.</li>
+
+      <li><b>Instant Support:</b> The chatbot responds instantly with encouraging words, 
+          stress-relief methods, or links to resources.</li>
+    </ul>
+    <h2>Tips for Effective Use</h2>
+    <ul>
+      <li><b>Be Honest:</b> Share your thoughts openly—the more real you are, the more helpful responses you’ll receive.</li>
+      <li><b>Stay Consistent:</b> Use the chatbot regularly to track your emotional well-being over time.</li>
+      <li><b>Explore Strategies:</b> Try relaxation techniques, breathing exercises, or affirmations suggested by the bot.</li>
+      <li><b>Know the Limits:</b> This chatbot is a support tool, not a substitute for professional care. If you feel overwhelmed, please reach out to a mental health professional.</li>
+    </ul>
+  </div>
+
+  <div class="credits-container">
+    <div class="credits-header">⚡ Credits</div>
+    <div class="credits-content">
+      <ul>
+        <li><span class="name">Shivansh Sharma</span> — Backend & Team Leader</li>
+        <li><span class="name">Mansi Gupta</span> — Tester and Supporter</li>
+        <li><span class="name">Yuvraj Singh</span> — Data Handling</li>
+        <li><span class="name">Mohd Shahbaz Khan</span> — Frontend Developer</li>
+      </ul>
+      <p class="footer">© 2025 Mindmate.ai</p>
+    </div>
+  </div>
+
+  <script>
+    // --- Credits Box Script ---
+    const header = document.querySelector('.credits-header');
+    const content = document.querySelector('.credits-content');
+    header.addEventListener('click', () => {
+      content.classList.toggle('show');
+    });
+  </script>
+</body>
+</html>

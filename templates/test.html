@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mental Health Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #e8f5e8 0%, #b3d9ff 50%, #ffeb99 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .bg-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.6;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .shape:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: -100px;
+            left: -100px;
+            background: rgba(173, 216, 230, 0.4);
+        }
+
+        .shape:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            right: -150px;
+            background: rgba(144, 238, 144, 0.4);
+        }
+
+        .shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            left: 10%;
+            background: rgba(255, 182, 193, 0.3);
+        }
+
+        .shape:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            bottom: 30%;
+            left: 20%;
+            background: rgba(255, 255, 224, 0.5);
+        }
+
+        .progress-container {
+            position: relative;
+            z-index: 10;
+            padding: 30px 20px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 100px);
+            padding: 20px;
+        }
+
+        .test-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .brand {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            color: #1e293b;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            line-height: 1.2;
+        }
+
+        .question {
+            color: #475569;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        #input-area {
+            margin-bottom: 40px;
+        }
+
+        .large-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 20px;
+            background: rgba(248, 250, 252, 0.8);
+            border: 2px solid rgba(226, 232, 240, 0.6);
+            border-radius: 16px;
+            font-size: 16px;
+            color: #475569;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            outline: none;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .large-textarea:focus {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .large-textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .char-counter.warning {
+            color: #f59e0b;
+        }
+
+        .char-counter.danger {
+            color: #ef4444;
+        }
+
+        .mcq-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .mcq-option {
+            background: rgba(248, 250, 252, 0.8);
+            border: 2px solid rgba(226, 232, 240, 0.6);
+            color: #475569;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+
+        .mcq-option:hover {
+            transform: translateY(-2px);
+            border-color: #a5b4fc;
+            background: #eef2ff;
+        }
+
+        .mcq-option.selected {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            min-width: 100px;
+        }
+
+        .btn-back {
+            background: rgba(248, 250, 252, 0.8);
+            color: #64748b;
+            border: 2px solid rgba(226, 232, 240, 0.6);
+        }
+
+        .btn-back:hover {
+            background: rgba(241, 245, 249, 0.9);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-next:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Results page enhancements */
+        .results-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 50px;
+            max-width: 900px;
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .results-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 16px;
+            background: #f8fafc;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .results-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-section h3 {
+            color: #1e293b;
+            font-size: 18px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #6366f1;
+        }
+
+        .results-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .results-list li {
+            background: rgba(99, 102, 241, 0.05);
+            margin: 8px 0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 4px solid #6366f1;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .risk-level {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .risk-low {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #22c55e;
+        }
+
+        .risk-moderate {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .risk-high {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #ef4444;
+        }
+
+        .encouraging-message {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #38bdf8;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #0c4a6e;
+        }
+
+        .professional-help-warning {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 15px;
+            color: #b91c1c;
+            font-weight: 500;
+        }
+
+        .results-footer {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @media (max-width:768px) {
+
+            .test-card,
+            .results-card {
+                padding: 30px 25px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width:480px) {
+
+            .test-card,
+            .results-card {
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .mcq-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+    <div class="container" id="container">
+        <div class="test-card">
+            <h1>Mental Health Test</h1>
+            <div class="question" id="questionText">Loading your personalized assessment...</div>
+            <div id="input-area">
+                <div class="spinner"></div>
+            </div>
+            <div class="buttons"><button class="btn btn-back" id="backBtn" disabled>Back</button><button
+                    class="btn btn-next" id="nextBtn" disabled>Next</button></div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [], currentQuestion = 0, answers = {}, finalAnalysisData = null;
+        const container = document.getElementById('container'), progressFill = document.getElementById('progressFill');
+        let questionText, inputArea, backBtn, nextBtn;
+
+        async function initTest() {
+            try {
+                showLoading('Generating personalized questions...');
+                const response = await fetch('/generate_questions');
+                const data = await response.json();
+                if (data.questions && data.questions.length > 0) {
+                    questions = data.questions;
+                    questions.forEach(q => answers[q.id] = null);
+                    restoreTestCard();
+                } else { throw new Error(data.error || 'No questions received'); }
+            } catch (e) {
+                console.error('Error loading questions:', e);
+                showError('Sorry, we couldn\'t generate questions. Please try again.');
+            }
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion]; if (!q) return;
+            questionText.textContent = q.question; inputArea.innerHTML = '';
+            if (q.type === 'mcq') {
+                const opts = document.createElement('div'); opts.className = 'mcq-options';
+                q.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'mcq-option'; btn.textContent = opt;
+                    btn.onclick = () => selectMCQOption(btn, q.id, opt);
+                    opts.appendChild(btn);
+                });
+                inputArea.appendChild(opts);
+                if (answers[q.id]) {
+                    const selectedBtn = Array.from(opts.children).find(b => b.textContent === answers[q.id]);
+                    if (selectedBtn) selectedBtn.classList.add('selected');
+                }
+            } else {
+                inputArea.innerHTML = `<textarea class="large-textarea" id="largeTextarea" placeholder="Share your thoughts here..." maxlength="500"></textarea><div class="char-counter" id="charCounter">0 / 500</div>`;
+                const ta = document.getElementById('largeTextarea');
+                ta.value = answers[q.id] || '';
+                ta.addEventListener('input', () => { answers[q.id] = ta.value.trim(); updateCharCounter(); checkInput(); });
+                updateCharCounter();
+            }
+            updateProgress(); checkInput(); updateButtonState();
+        }
+
+        function selectMCQOption(btn, id, ans) { Array.from(btn.parentElement.children).forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); answers[id] = ans; checkInput(); }
+        function checkInput() {
+            const q = questions[currentQuestion]; if (!q) return;
+            const ans = answers[q.id]; let valid = false;
+            if (q.type === 'open') valid = ans && ans.length >= 10; else valid = ans !== null && ans !== undefined;
+            nextBtn.disabled = !valid;
+        }
+        function nextQuestion() { if (currentQuestion < questions.length - 1) { currentQuestion++; loadQuestion(); } else submitTest(); }
+        function previousQuestion() { if (currentQuestion > 0) { currentQuestion--; loadQuestion(); } }
+
+        async function submitTest() {
+            progressFill.style.width = `100%`; showLoading('Analyzing your responses...');
+            const finalAnswers = {}; questions.forEach(q => { if (answers[q.id]) finalAnswers[q.question] = answers[q.id]; });
+            try {
+                const res = await fetch('/submit_test', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers: finalAnswers }) });
+                const data = await res.json();
+                if (data.success && data.analysis) { finalAnalysisData = data.analysis; displayResults(data.analysis); }
+                else throw new Error(data.error || 'Analysis failed');
+            } catch (e) { console.error('Error submitting test:', e); showError('There was an error analyzing your responses.'); }
+        }
+
+        function updateCharCounter() {
+            const ta = document.getElementById('largeTextarea'), cc = document.getElementById('charCounter'); if (!ta || !cc) return;
+            const len = ta.value.length, max = 500; cc.textContent = `${len} / ${max}`; cc.classList.remove('warning', 'danger');
+            if (len > max * 0.95) cc.classList.add('danger'); else if (len > max * 0.8) cc.classList.add('warning');
+        }
+        function updateProgress() { const progress = ((currentQuestion + 1) / questions.length) * 100; progressFill.style.width = `${progress}%`; }
+        function updateButtonState() { backBtn.disabled = currentQuestion === 0; nextBtn.textContent = (currentQuestion === questions.length - 1) ? 'Submit' : 'Next'; }
+
+        function displayResults(analysis) {
+            const warn = analysis.professional_help_needed ? `<div class="professional-help-warning"><strong>Important:</strong> Based on your responses, we strongly recommend seeking professional mental health support. Please consider talking to a counselor or therapist.</div>` : '';
+            container.innerHTML = `
+      <div class="results-card">
+        <div class="brand">Mindmate</div>
+        <h1>Your Assessment Results</h1>
+        <div class="results-section"><h3>📋 Overall Assessment</h3><p style="line-height:1.6;color:#475569;">${analysis.overall_assessment}</p></div>
+        <div class="results-section"><h3>🎯 Risk Level</h3><span class="risk-level risk-${analysis.risk_level.toLowerCase()}">${analysis.risk_level}</span>${warn}</div>
+        <div class="results-section"><h3>🔍 Key Insights</h3><ul class="results-list">${(analysis.key_insights || []).map(i => `<li>${i}</li>`).join('')}</ul></div>
+        <div class="results-section"><h3>💪 Your Strengths</h3><ul class="results-list">${(analysis.strengths || []).map(s => `<li>✅ ${s}</li>`).join('')}</ul></div>
+        <div class="results-section"><h3>⚡ Areas for Attention</h3><ul class="results-list">${(analysis.areas_for_attention || []).map(a => `<li>🎯 ${a}</li>`).join('')}</ul></div>
+        <div class="results-section"><h3>💡 Recommendations</h3><ul class="results-list">${(analysis.recommendations || []).map(r => `<li>💡 ${r}</li>`).join('')}</ul></div>
+        <div class="encouraging-message"><strong>💝 A Message for You:</strong><br>${analysis.encouraging_message}</div>
+        <div class="buttons" style="margin-top:30px;"><button class="btn btn-back" onclick="location.href='/chat'">Back to Chat</button><button class="btn btn-next" onclick="generatePDF()">📄 Download Report</button></div>
+        <div class="results-footer">Generated by Mindmate.ai – ${new Date().toLocaleDateString()}</div>
+      </div>`;
+        }
+
+
+        function generatePDF() {
+            try {
+                if (!finalAnalysisData) {
+                    alert("No analysis data available.");
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf || {};
+                if (!jsPDF) {
+                    alert("PDF library not loaded.");
+                    return;
+                }
+
+                const doc = new jsPDF();
+                doc.setProperties({ title: "Mindmate Mental Health Report" });
+
+                // Page size and margins
+                const pageWidth = doc.internal.pageSize.width;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 25;
+                const contentWidth = pageWidth - 2 * margin;
+
+                // Text style sizes
+                const titleFontSize = 26;
+                const subTitleFontSize = 14;
+                const headingFontSize = 18;
+                const subHeadingFontSize = 14;
+                const normalFontSize = 12;
+                const lineHeight = 7;
+
+                let yPos = margin;
+
+                // Helper to add wrapped text with page breaks
+                function addText(text, x, y, options = {}) {
+                    const {
+                        maxWidth = contentWidth,
+                        fontSize = normalFontSize,
+                        fontStyle = "normal",
+                        color = [34, 34, 34],
+                        lineHeightOverride = lineHeight,
+                    } = options;
+
+                    doc.setFontSize(fontSize);
+                    doc.setFont("helvetica", fontStyle);
+                    doc.setTextColor(...color);
+
+                    const lines = doc.splitTextToSize(String(text || ""), maxWidth);
+                    for (const line of lines) {
+                        if (y > pageHeight - margin - lineHeightOverride) {
+                            doc.addPage();
+                            y = margin;
+                        }
+                        doc.text(line, x, y);
+                        y += lineHeightOverride;
+                    }
+                    return y;
+                }
+
+                // Add centered title page
+                doc.setFontSize(titleFontSize);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(20, 30, 48);
+                doc.text("Mindmate Mental Health Report", pageWidth / 2, yPos + 15, { align: "center" });
+                yPos += 30;
+
+                doc.setFontSize(subTitleFontSize);
+                doc.setFont("helvetica", "italic");
+                doc.setTextColor(90, 90, 90);
+                doc.text("Comprehensive Mental Health Assessment", pageWidth / 2, yPos, { align: "center" });
+                yPos += 12;
+                doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth / 2, yPos, { align: "center" });
+                yPos += 20;
+
+                doc.setDrawColor(190, 190, 190);
+                doc.setLineWidth(0.5);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 10;
+                
+                // Section title helper with underline and spacing
+                function addSectionTitle(text) {
+                    yPos = addText(text, margin, yPos, {
+                        fontSize: headingFontSize,
+                        fontStyle: "bold",
+                        color: [50, 60, 100],
+                    });
+                    yPos += 6; // spacing before line
+
+                    // draw line right below heading
+                    doc.setDrawColor(70, 90, 130);
+                    doc.setLineWidth(0.8);
+                    doc.line(margin, yPos, pageWidth - margin, yPos);
+                    yPos += 12; // spacing after line for content
+
+                    return yPos;
+                }
+
+                // Subsection heading helper
+                function addSubSectionTitle(text) {
+                    yPos = addText(text, margin, yPos, {
+                        fontSize: subHeadingFontSize,
+                        fontStyle: "bold",
+                    });
+                    yPos += 4;
+                    return yPos;
+                }
+
+                // Bulleted list helper
+                function addBullets(items) {
+                    const bulletIndent = 10;
+                    items.forEach(item => {
+                        const bullet = "\u2022";
+                        const textIndent = margin + bulletIndent;
+                        yPos = addText(bullet, margin, yPos, { fontSize: normalFontSize, fontStyle: "bold" });
+                        yPos = addText(item, textIndent, yPos - lineHeight, { maxWidth: contentWidth - bulletIndent });
+                        yPos += 3;
+                    });
+                    yPos += 8;
+                }
+
+                // Numbered list helper
+                function addNumberedList(items) {
+                    const numberIndent = 10;
+                    items.forEach((item, idx) => {
+                        const numberText = `${idx + 1}.`;
+                        const textIndent = margin + numberIndent;
+                        yPos = addText(numberText, margin, yPos, { fontSize: normalFontSize, fontStyle: "bold" });
+                        yPos = addText(item, textIndent, yPos - lineHeight, { maxWidth: contentWidth - numberIndent });
+                        yPos += 3;
+                    });
+                    yPos += 8;
+                }
+
+                // 1. Overall Assessment section
+                yPos = addSectionTitle("1. Overall Assessment");
+                yPos = addText(finalAnalysisData.overall_assessment, margin, yPos);
+
+                // 2. Risk Level section
+                // Add extra spacing above risk section to separate from previous content
+                yPos += 10;
+
+                // Use section title helper for heading + line
+                yPos = addText("2. Risk Level", margin, yPos, {
+                    fontSize: headingFontSize,
+                    fontStyle: "bold",
+                    color: [50, 60, 100],
+                });
+                yPos += 6; // spacing before underline
+
+                doc.setDrawColor(70, 90, 130);
+                doc.setLineWidth(0.8);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+                yPos += 12; // spacing after line before content
+
+                const riskLevel = finalAnalysisData.risk_level || "Unknown";
+                const riskColors = {
+                    high: [204, 0, 0],
+                    moderate: [255, 140, 0],
+                    low: [0, 128, 0],
+                };
+                const color = riskColors[riskLevel.toLowerCase()] || [0, 0, 0];
+                yPos = addText(riskLevel, margin, yPos, { fontSize: subHeadingFontSize, fontStyle: "bold", color });
+                yPos += 8;
+
+                if (finalAnalysisData.professional_help_needed) {
+                    yPos = addText(
+                        "Based on your responses, we strongly recommend seeking professional mental health support.",
+                        margin,
+                        yPos,
+                        { fontSize: normalFontSize, color: [180, 0, 0] }
+                    );
+                    yPos += 10;
+                }
+
+                // 3. Key Insights section
+                yPos = addSectionTitle("3. Key Insights");
+                addBullets(finalAnalysisData.key_insights || []);
+
+                // 4. Your Strengths
+                yPos = addSectionTitle("4. Your Strengths");
+                addBullets(finalAnalysisData.strengths || []);
+
+                // 5. Areas for Attention
+                yPos = addSectionTitle("5. Areas for Attention");
+                addBullets(finalAnalysisData.areas_for_attention || []);
+
+                // 6. Recommendations
+                yPos = addSectionTitle("6. Recommendations");
+                addNumberedList(finalAnalysisData.recommendations || []);
+
+                // 7. Encouraging Message
+                yPos = addSectionTitle("7. Encouraging Message");
+                yPos = addText(finalAnalysisData.encouraging_message, margin, yPos);
+
+                // Footer with page numbers and branding on all pages
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(10);
+                    doc.setFont("helvetica", "normal");
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(`Page ${i} of ${pageCount} — Generated by Mindmate.ai`, pageWidth - margin, pageHeight - 10, {
+                        align: "right",
+                    });
+                }
+
+                // Save PDF
+                doc.save("Mindmate_Mental_Health_Report.pdf");
+            } catch (err) {
+                console.error(err);
+                alert("Failed to generate PDF report. Check console for details.");
+            }
+        }
+
+
+
+
+
+        function showLoading(msg) {
+            container.innerHTML = `<div class="test-card"><div class="brand">Mindmate</div><h1>${msg}</h1><div style="margin-top:30px;"><div class="spinner"></div></div></div>`;
+        }
+        function showError(msg) {
+            container.innerHTML = `<div class="test-card"><div class="brand">Mindmate</div><h1>Error</h1><p style="color:#ef4444;margin:20px 0;">${msg}</p><button class="btn btn-next" onclick="location.reload()">Retry</button></div>`;
+        }
+        function restoreTestCard() {
+            container.innerHTML = `
+      <div class="test-card">
+        <div class="brand">Mindmate</div>
+        <h1>Mental Health Test</h1>
+        <div class="question" id="questionText"></div>
+        <div id="input-area"></div>
+        <div class="buttons"><button class="btn btn-back" id="backBtn" disabled>Back</button><button class="btn btn-next" id="nextBtn" disabled>Next</button></div>
+      </div>`;
+            questionText = document.getElementById('questionText');
+            inputArea = document.getElementById('input-area');
+            backBtn = document.getElementById('backBtn'); nextBtn = document.getElementById('nextBtn');
+            backBtn.onclick = previousQuestion; nextBtn.onclick = nextQuestion;
+            loadQuestion();
+        }
+
+        window.onload = initTest;
+    </script>
+</body>
+
+</html>

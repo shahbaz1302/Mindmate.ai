@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindmate.ai</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        #liquid-ether-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .landing-container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            width: 90%;
+            padding: 2rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease-out forwards 0.3s;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .brand-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(82, 39, 255, 0.5);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            animation: float 4s ease-in-out infinite alternate;
+        }
+
+        .logo img:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 0 40px rgba(82, 39, 255, 0.8);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(82, 39, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .description {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 1ch;
+            animation: blink 0.8s step-end infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .landing-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            margin-top: 2rem;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            backdrop-filter: blur(10px);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #5227FF;
+            box-shadow: 0 0 20px rgba(82, 39, 255, 0.5);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .word-count {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 8px;
+            border-radius: 10px;
+            transform: scale(0);
+            transition: transform 0.4s ease;
+        }
+
+        .word-count.show {
+            transform: scale(1);
+        }
+
+        button {
+            background: linear-gradient(45deg, #5227FF, #FF9FFC);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 0 auto;
+            width: 280px;
+            box-shadow: 0 0 15px rgba(82, 39, 255, 0.5);
+            animation: floatBtn 3s ease-in-out infinite alternate;
+        }
+
+        button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(82, 39, 255, 0.8);
+        }
+
+        @keyframes floatBtn {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .result-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-box h2 {
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .result-box p {
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        #chatBtn {
+            background: linear-gradient(45deg, #FF9FFC, #B19EEF);
+            animation: floatBtn 3s ease-in-out infinite alternate;
+        }
+
+        #chatBtn:hover {
+            background: linear-gradient(45deg, #e88ce5, #9e8bd3);
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        @media (width<=768px) {
+            button{
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="liquid-ether-canvas"></canvas>
+    <div class="landing-container">
+        <div class="brand-header">
+            <div class="logo">
+                <img src="https://media.istockphoto.com/id/889895020/vector/mind-icon.jpg?s=612x612&w=0&k=20&c=4235uiE6zP4H1LFnzYPi4i8D79m_v7MX_7ANYiT0eJQ="
+                    alt="Mindmate.ai Logo">
+            </div>
+            <div>
+                <div class="title">Welcome to Mindmate.ai</div>
+                <div class="subtitle">Your Mental Care Taker</div>
+            </div>
+        </div>
+        <p class="description" id="description">
+            <!-- This is a safe space to express yourself. Start by typing a few sentences about what's on your mind, and
+            we'll begin our conversation. -->
+        </p>
+        <form id="queryForm" class="landing-form">
+            <div class="textarea-container">
+                <textarea id="queryInput" name="query" placeholder="Tell me how you're feeling today (0-500 words)..."
+                    required maxlength="2500"></textarea>
+                <div class="word-count" id="wordCount">0/500 words</div>
+            </div>
+            <button type="submit" id="submitBtn">
+                <span id="btnText">Analyze Emotion</span>
+                <div id="loader" class="loader" style="display: none;"></div>
+            </button>
+        </form>
+        <div id="resultBox" class="result-box">
+            <h2>Detected Emotion: <span id="emotion-text"></span></h2>
+            <p>Based on your input, it seems you might be feeling this way. Ready to talk more about it?</p>
+            <button id="chatBtn" onclick="goToChat()">Continue to Chat</button>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const canvas = document.getElementById('liquid-ether-canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (!gl) return;
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, canvas.width, canvas.height); }
+            window.addEventListener('resize', resizeCanvas); resizeCanvas();
+            const vertexShaderSource = `attribute vec2 aPosition;varying vec2 vPosition;void main(){vPosition=aPosition;gl_Position=vec4(aPosition,0.0,1.0);}`;
+            const fragmentShaderSource = `precision highp float;varying vec2 vPosition;uniform float uTime;uniform vec2 uResolution;uniform vec3 uColors[3];float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);vec2 u=f*f*(3.0-2.0*f);return mix(mix(hash(i+vec2(0.0,0.0)),hash(i+vec2(1.0,0.0)),u.x),mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x),u.y);}float fbm(vec2 p){float v=0.0,a=0.5;for(int i=0;i<6;i++){v+=a*noise(p);p*=2.0;a*=0.5;}return v;}void main(){vec2 uv=(vPosition+1.0)/2.0;uv.x*=uResolution.x/uResolution.y;float time=uTime*0.5;vec3 color=vec3(0.0);for(int i=0;i<3;i++){float intensity=0.3+0.2*float(i);float speed=0.5+0.3*float(i);float scale=2.0+2.0*float(i);vec2 flow=vec2(fbm(uv*scale+vec2(time*speed,time*speed*0.7)),fbm(uv*scale+vec2(time*speed*1.2,time*speed*0.5)));vec2 finalUV=uv+flow*0.1;float gradient=sin(finalUV.x*3.0+time*speed)*0.5+0.5;gradient*=cos(finalUV.y*2.0+time*speed*1.3)*0.5+0.5;color+=uColors[i]*gradient*intensity;}gl_FragColor=vec4(color,1.0);}`;
+            function compileShader(source, type) { const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader); return shader; }
+            const vertexShader = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
+            const fragmentShader = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+            const program = gl.createProgram(); gl.attachShader(program, vertexShader); gl.attachShader(program, fragmentShader); gl.linkProgram(program); gl.useProgram(program);
+            const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]); const vertexBuffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+            const positionAttributeLocation = gl.getAttribLocation(program, "aPosition"); gl.enableVertexAttribArray(positionAttributeLocation); gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+            const timeUniformLocation = gl.getUniformLocation(program, "uTime"); const resolutionUniformLocation = gl.getUniformLocation(program, "uResolution"); const colorsUniformLocation = gl.getUniformLocation(program, "uColors");
+            function hexToRgb(hex) { const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255] : [0, 0, 0]; }
+            const colors = ['#5227FF', '#FF9FFC', '#B19EEF'];
+            let startTime = Date.now();
+            function animate() { const currentTime = (Date.now() - startTime) / 1000; gl.uniform1f(timeUniformLocation, currentTime); gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height); gl.uniform3fv(colorsUniformLocation, [...hexToRgb(colors[0]), ...hexToRgb(colors[1]), ...hexToRgb(colors[2])]); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); requestAnimationFrame(animate); }
+            animate();
+        })();
+
+        const queryInput = document.getElementById('queryInput');
+        const wordCount = document.getElementById('wordCount');
+        queryInput.addEventListener('input', function () {
+            const text = this.value.trim();
+            const words = text ? text.split(/\s+/).filter(w => w.length > 0) : [];
+            wordCount.textContent = `${words.length}/500 words`;
+            if (words.length > 0) wordCount.classList.add('show'); else wordCount.classList.remove('show');
+            if (words.length > 450) wordCount.style.color = words.length > 500 ? '#ff4757' : '#ffa502'; else wordCount.style.color = 'rgba(255,255,255,0.6)';
+        });
+
+        let detectedEmotion = "Unknown";
+        const form = document.getElementById("queryForm");
+        const submitBtn = document.getElementById("submitBtn");
+        const btnText = document.getElementById("btnText");
+        const loader = document.getElementById("loader");
+        const resultBox = document.getElementById("resultBox");
+        const emotionText = document.getElementById("emotion-text");
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const query = queryInput.value.trim();
+            if (!query) return;
+            const words = query.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 500) { alert("Please limit your input to 500 words or less."); return; }
+            btnText.style.display = 'none'; loader.style.display = 'block'; submitBtn.disabled = true;
+            resultBox.style.display = "none"; resultBox.classList.remove('show');
+            try {
+                const response = await fetch("/search", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ query }) });
+                const data = await response.json();
+                detectedEmotion = data.emotion || "Unknown";
+                emotionText.textContent = detectedEmotion;
+                resultBox.style.display = "block";
+                setTimeout(() => resultBox.classList.add('show'), 50);
+            } catch (err) { emotionText.textContent = "Error"; resultBox.style.display = "block"; console.error(err); }
+            finally { btnText.style.display = 'inline'; loader.style.display = 'none'; submitBtn.disabled = false; }
+        });
+
+        const descriptionEl = document.getElementById('description');
+        const text = "This is a safe space to express yourself. Start by typing a few sentences about what's on your mind, and we'll begin our conversation.";
+
+        let index = 0;
+
+        function typeChar() {
+            if (index < text.length) {
+                descriptionEl.innerHTML += text.charAt(index);
+                index++;
+                setTimeout(typeChar, 40); // typing speed in ms
+            } else {
+                // optional blinking cursor
+                descriptionEl.innerHTML += '<span class="cursor">|</span>';
+            }
+        }
+
+        typeChar();
+
+        function goToChat() { window.location.href = `/chat?emotion=${encodeURIComponent(detectedEmotion)}`; }
+    </script>
+</body>
+
+</html>
